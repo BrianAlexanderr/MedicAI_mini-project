@@ -3,7 +3,7 @@ Hello here is my little project that i created :D. Actually this is the final gr
 
 ## ⚠ Disclaimer
 Dont take the result of the diagnose too seriusly cause to be honest the dataset i used for the AI prediction is still not perfect so it just use to more like demonstrate how the predictions works. Further improve can be done by having a better and credible datasets.
-Hospitals inputted here is just an example.
+<br>Hospitals inputted here is just an example.
 
 ## 📌 Features
 - 🏥 **AI Diagnosis** – Predicts diseases based on user-input symptoms.
