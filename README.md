@@ -27,7 +27,8 @@ MedicAI_mini-project/
 │── New Folder/          # List of Example Hospital Images
 │── medicai/             # Frontend app (Flutter)
 │── README.md            # Project overview
-└── img.py               # Fetch img into supabase  
+│── img.py               # Fetch img into supabase 
+└── requirement.txt      # Dependencies needed to train the model               
 ```
 
 ## Backend Url
