@@ -14,7 +14,6 @@ Dont take the result of the diagnose too seriusly cause to be honest the dataset
 
 ---
 
-<br><br><br>
 ## Backend Url
 So ive deplyed my backend app on railway so you can visit my backend app repository below <br>
 https://github.com/BrianAlexanderr/django-railway <br><br><br>
