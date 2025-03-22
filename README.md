@@ -41,8 +41,12 @@ https://docs.flutter.dev/get-started/install/windows <br><br><br>
 
 
 ## Dependencies
-The model can be used directly, but if you wanted to try other model or retrain you install the required dependencies and try it yourself 😁
+The model can be used directly, but if you wanted to try other model or retrain you install the required dependencies and try it yourself 😁<br>
 run `pip install -r requirements.txt`
+<br>
+<br>
+<br>
+<br>
 
 ## 👨‍💻 Contributors
 - Brian Alexander
