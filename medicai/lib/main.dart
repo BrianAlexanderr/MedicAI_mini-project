@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:medicai/Pages/intro_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await dotenv.load(fileName: '.env');
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+      apiKey: dotenv.env['FIREBASE_API_KEY']!,
+      appId: dotenv.env['FIREBASE_MOBILE_SDK_APP_ID']!,
+      messagingSenderId: dotenv.env['FIREBASE_PROJECT_ID']!,
+      projectId: dotenv.env['FIREBASE_STORAGE_BUCKET']!,
+    ),
+  );
   runApp(const MyApp());
 }
 
