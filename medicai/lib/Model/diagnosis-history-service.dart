@@ -3,7 +3,7 @@ import 'dart:convert';
 
 class DiagnosisHistoryService {
   static const String baseUrl =
-      'https://django-railway-production-0985.up.railway.app/api';
+      'http://192.168.0.70:8000';
 
   // Get all diagnosis history for the current user
   static Future<List<Map<String, dynamic>>> getDiagnosisHistory() async {

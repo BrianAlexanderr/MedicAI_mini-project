@@ -36,7 +36,7 @@ class _DiagnosePageState extends State<DiagnosePage> {
   Future<List<Map<String, dynamic>>> fetchSymptoms() async {
     final response = await http.get(
       Uri.parse(
-        'https://django-railway-production-0985.up.railway.app/api/symptoms/',
+        'http://192.168.0.70:8000/api/symptoms/',
       ),
     );
 
@@ -112,7 +112,7 @@ class _DiagnosePageState extends State<DiagnosePage> {
     try {
       final response = await http.post(
         Uri.parse(
-          'https://django-railway-production-0985.up.railway.app/api/get_precautions/',
+          'http://192.168.0.70:8000/api/get_precautions/',
         ),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'disease': disease}),
@@ -138,7 +138,7 @@ class _DiagnosePageState extends State<DiagnosePage> {
     try {
       final response = await http.post(
         Uri.parse(
-          'https://django-railway-production-0985.up.railway.app/api/get_symptom_names/',
+          'http://192.168.0.70:8000/api/get_symptom_names/',
         ), // Replace with actual API
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'symptom_ids': symptomIds}),
@@ -170,7 +170,7 @@ class _DiagnosePageState extends State<DiagnosePage> {
     try {
       final response = await http.post(
         Uri.parse(
-          "https://django-railway-production-0985.up.railway.app/api/save_diagnosis/",
+          "http://192.168.0.70:8000/api/save_diagnosis/",
         ),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
@@ -208,7 +208,7 @@ class _DiagnosePageState extends State<DiagnosePage> {
     try {
       final response = await http.post(
         Uri.parse(
-          'https://django-railway-production-0985.up.railway.app/api/predict_disease/',
+          'http://192.168.0.70:8000/api/predict_disease/',
         ),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"symptoms": selected}),

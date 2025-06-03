@@ -53,7 +53,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
       await http.post(
         Uri.parse(
-          'https://django-railway-production-0985.up.railway.app/api/register_user/',
+          'http://192.168.0.70:8000/api/register_user/',
         ),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({

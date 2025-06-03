@@ -26,14 +26,10 @@ class Doctor {
 
 class DoctorService {
   static Future<List<Doctor>> fetchDoctors(int diseaseId) async {
-    final url = Uri.parse(
-      'https://django-railway-production-0985.up.railway.app/api/doctors/$diseaseId/',
-    );
-
+    final url = Uri.parse('http://192.168.0.70:8000/api/doctors/$diseaseId/');
     try {
       final response = await http.get(url);
-      print("Response Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
+      print(response.statusCode);
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
 

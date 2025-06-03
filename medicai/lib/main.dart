@@ -5,13 +5,13 @@ import 'package:firebase_core/firebase_core.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: '.env');
+  await dotenv.load(fileName: 'lib/Assets/.env');
   await Firebase.initializeApp(
     options: FirebaseOptions(
       apiKey: dotenv.env['FIREBASE_API_KEY']!,
       appId: dotenv.env['FIREBASE_MOBILE_SDK_APP_ID']!,
-      messagingSenderId: dotenv.env['FIREBASE_PROJECT_ID']!,
-      projectId: dotenv.env['FIREBASE_STORAGE_BUCKET']!,
+      projectId : dotenv.env['FIREBASE_PROJECT_ID']!,
+      messagingSenderId: dotenv.env['FIREBASE_STORAGE_BUCKET']!,
     ),
   );
   runApp(const MyApp());

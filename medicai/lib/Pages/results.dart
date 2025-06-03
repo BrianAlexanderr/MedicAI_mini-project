@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:medicai/Pages/chat_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:medicai/Model/list_doctors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+final user = FirebaseAuth.instance.currentUser;
+final userId = user?.uid;  // Ini yang harus dikirim sebagai 'user_id'
 
 class DiagnosisResultPage extends StatefulWidget {
   final List<int> selectedSymptoms;
@@ -38,9 +43,7 @@ class _DiagnosisResultPageState extends State<DiagnosisResultPage> {
   Future<void> fetchDiseasePrecautions() async {
     try {
       final response = await http.post(
-        Uri.parse(
-          'https://django-railway-production-0985.up.railway.app/api/get_precautions/',
-        ),
+        Uri.parse('http://192.168.0.70:8000/api/get_precautions/'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'disease': widget.disease}),
       );
@@ -71,7 +74,7 @@ class _DiagnosisResultPageState extends State<DiagnosisResultPage> {
     try {
       final response = await http.post(
         Uri.parse(
-          'https://django-railway-production-0985.up.railway.app/api/get_symptom_names/',
+          'http://192.168.0.70:8000/api/get_symptom_names/',
         ), // Replace with actual API
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'symptom_ids': widget.selectedSymptoms}),
@@ -97,6 +100,33 @@ class _DiagnosisResultPageState extends State<DiagnosisResultPage> {
     // Uncomment based on your backend
     // fetchSymptomsFromFirestore(); // If using Firebase
     fetchSymptomsFromDjangoAPI(); // If using Django API
+  }
+
+  Future<int> getOrCreateConsultation(int doctorId) async {
+    final url = Uri.parse(
+      'http://192.168.0.70:8000/api/consultations/get_or_create/',
+    );
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json', 
+      },
+      body: jsonEncode({
+        'user_id': userId,
+        'doctor_id': doctorId
+      }),
+    );
+
+    print('Status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['consultation_id']; // asumsi backend kasih ini
+    } else {
+      throw Exception('Failed to get or create consultation');
+    }
   }
 
   @override
@@ -276,11 +306,13 @@ class _DiagnosisResultPageState extends State<DiagnosisResultPage> {
                                   return Column(
                                     children: [
                                       _buildDoctorContact(
+                                        id: 098,
                                         name: 'dr. Ainstein Elbert',
                                         specialty: 'Dokter Umum',
                                       ),
                                       const Divider(height: 24),
                                       _buildDoctorContact(
+                                        id: 123,
                                         name: 'dr. Eliza Susanto',
                                         specialty: 'Dokter Umum',
                                       ),
@@ -301,6 +333,7 @@ class _DiagnosisResultPageState extends State<DiagnosisResultPage> {
                                           return Column(
                                             children: [
                                               _buildDoctorContact(
+                                                id: doctor.doctorId,
                                                 name: doctor.name,
                                                 specialty:
                                                     doctor.specialization,
@@ -341,8 +374,8 @@ class _DiagnosisResultPageState extends State<DiagnosisResultPage> {
                 child: const Text(
                   'Kembali',
                   style: TextStyle(
-                    fontSize: 16, 
-                    fontWeight: FontWeight.w500, 
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
                     fontFamily: 'BreeSerif',
                   ),
                 ),
@@ -355,6 +388,7 @@ class _DiagnosisResultPageState extends State<DiagnosisResultPage> {
   }
 
   Widget _buildDoctorContact({
+    required int id,
     required String name,
     required String specialty,
   }) {
@@ -404,8 +438,25 @@ class _DiagnosisResultPageState extends State<DiagnosisResultPage> {
               color: Colors.black,
               size: 20,
             ),
-            onPressed: () {
-              // Chat functionality would go here
+            onPressed: () async {
+              try {
+                int consultationId = await getOrCreateConsultation(id);
+
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder:
+                        (context) => ChatScreen(
+                          consultationid: consultationId,
+                          doctorid: id,
+                          doctorName: name,
+                          doctorSpecialty: specialty,
+                        ),
+                  ),
+                );
+              } catch (e) {
+                print('Error saat buat konsultasi: $e');
+              }
             },
             padding: EdgeInsets.zero,
           ),

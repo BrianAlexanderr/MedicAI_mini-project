@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:medicai/Pages/diagnose.dart';
+import 'package:medicai/Pages/diagnose_result.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
@@ -41,9 +42,7 @@ class _DiagnosisHistoryPageState extends State<DiagnosisHistoryPage> {
     try {
       // Replace with your actual API endpoint
       final response = await http.get(
-        Uri.parse(
-          'https://django-railway-production-0985.up.railway.app/api/api/medical_history/$userID/',
-        ),
+        Uri.parse('http://192.168.0.70:8000/api/api/medical_history/$userID/'),
         headers: {
           'Content-Type': 'application/json',
           // Add any required authentication headers here
@@ -266,7 +265,7 @@ class _DiagnosisHistoryPageState extends State<DiagnosisHistoryPage> {
               'Riwayat diagnosa Anda akan muncul di sini',
               textAlign: TextAlign.center,
               style: TextStyle(
-                fontSize: 16, 
+                fontSize: 16,
                 color: Colors.grey[600],
                 fontFamily: 'BreeSerif',
               ),
@@ -333,10 +332,15 @@ class _DiagnosisHistoryPageState extends State<DiagnosisHistoryPage> {
       child: InkWell(
         onTap: () {
           // Navigate to diagnosis detail page
-          Navigator.pushNamed(
+          Navigator.push(
             context,
-            '/diagnosis_detail',
-            arguments: diagnosis.userId,
+            MaterialPageRoute(
+              builder: (context) => DiagnosisResultPage(
+                selectedSymptoms: diagnosis.symptoms,
+                disease: diagnosis.diagnosis,
+                precaution: diagnosis.doctor_notes,
+              ), 
+            )
           );
         },
         borderRadius: BorderRadius.circular(12),
@@ -427,7 +431,18 @@ class _DiagnosisHistoryPageState extends State<DiagnosisHistoryPage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DiagnosisResultPage(
+                            selectedSymptoms: diagnosis.symptoms,
+                            disease: diagnosis.diagnosis,
+                            precaution: diagnosis.doctor_notes,
+                          ), 
+                        )
+                      );
+                    },
                     style: TextButton.styleFrom(
                       foregroundColor: const Color(0xFF3CB371),
                       padding: const EdgeInsets.symmetric(
@@ -458,6 +473,7 @@ class DiagnosisRecord {
   final int historyId;
   final String userId;
   final String diagnosis;
+  final String doctor_notes;
   final List<String> symptoms;
   final DateTime diagnosisDate;
 
@@ -465,6 +481,7 @@ class DiagnosisRecord {
     required this.historyId,
     required this.userId,
     required this.diagnosis,
+    required this.doctor_notes,
     required this.symptoms,
     required this.diagnosisDate,
   });
@@ -475,6 +492,7 @@ class DiagnosisRecord {
       historyId: json['history_id'],
       userId: json['user_id'].toString(),
       diagnosis: json['diagnosis'],
+      doctor_notes: json['doctor_notes'],
       symptoms: List<String>.from(json['symptoms']),
       diagnosisDate: DateTime.parse(json['created_at']),
     );

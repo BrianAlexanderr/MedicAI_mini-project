@@ -58,9 +58,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> fetchFacilities() async {
-    final url = Uri.parse(
-      'https://django-railway-production-0985.up.railway.app/api/facilities/',
-    );
+    final url = Uri.parse('http://192.168.0.70:8000/api/facilities/');
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
