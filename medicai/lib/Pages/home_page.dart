@@ -5,6 +5,7 @@ import 'package:medicai/Pages/login_page.dart';
 import 'package:medicai/Pages/diagnose.dart';
 import 'package:medicai/Pages/hospital_page.dart';
 import 'package:medicai/Pages/History_page.dart';
+import 'package:medicai/Pages/chat_log.dart';
 import '../Model/hospital_model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -331,56 +332,66 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(height: 40),
 
                     // Contact Dokter button
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // Chat bubble icon
-                        Container(
-                          width: 120,
-                          height: 70,
-                          child: Image.asset('lib/Assets/Group 44.png'),
-                        ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MedicAIChatApp(),
+                          ),
+                        );
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // Chat bubble icon
+                          Container(
+                            width: 120,
+                            height: 70,
+                            child: Image.asset('lib/Assets/Group 44.png'),
+                          ),
 
-                        // Contact Dokter button
-                        Container(
-                          width: 220,
-                          height: 140,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF8DE4B5),
-                            borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(20),
-                              bottomRight: Radius.circular(20),
+                          // Contact Dokter button
+                          Container(
+                            width: 220,
+                            height: 140,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF8DE4B5),
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(20),
+                                bottomRight: Radius.circular(20),
+                              ),
+                            ),
+                            child: const Padding(
+                              padding: EdgeInsets.all(16.0),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Contact',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'BreeSerif',
+                                    ),
+                                  ),
+                                  Text(
+                                    'Dokter',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'BreeSerif',
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(
-                                  'Contact',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'BreeSerif',
-                                  ),
-                                ),
-                                Text(
-                                  'Dokter',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'BreeSerif',
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
 
                     const SizedBox(height: 40),
