@@ -11,25 +11,17 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
     _checkLoginStatus();
-  }
-
-  User? getCurrentUser() {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    return auth.currentUser; // Returns null if no user is logged in
-  }
-
-  void checkUser() {
-    User? user = getCurrentUser();
-    if (user != null) {
-    } else {}
   }
 
   Future<void> saveUserInfo(User user) async {
@@ -42,15 +34,14 @@ class _LoginPageState extends State<LoginPage> {
     User? user = _auth.currentUser;
     if (user != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
-    });
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      });
     }
   }
 
-  // Show error message in an AlertDialog
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
@@ -67,8 +58,24 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // Login function with error handling
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) return 'Please enter your email';
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(value)) return 'Please enter a valid email address';
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) return 'Please enter your password';
+    if (value.length < 6) return 'Password must be at least 6 characters';
+    return null;
+  }
+
   Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) {
+      return; // Stop login if form is invalid
+    }
+
     setState(() => isLoading = true);
     try {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
@@ -76,10 +83,8 @@ class _LoginPageState extends State<LoginPage> {
         password: _passwordController.text.trim(),
       );
 
-      // Save user info locally
       await saveUserInfo(userCredential.user!);
 
-      // Navigate to HomePage
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
@@ -98,16 +103,17 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 80.0, right: 80, bottom: 30),
-              child: Image.asset('lib/Assets/Logo.png', height: 175),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(0),
-              child: Text(
+        child: Form(
+          key: _formKey, // Form key untuk validasi
+          autovalidateMode: AutovalidateMode.onUserInteraction, // Real-time validation
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 80.0, right: 80, bottom: 30),
+                child: Image.asset('lib/Assets/Logo.png', height: 150),
+              ),
+              Text(
                 "Sign In",
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -117,71 +123,80 @@ class _LoginPageState extends State<LoginPage> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            TextFormField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                hintText: 'Email',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                filled: true,
-                fillColor: Colors.grey[200],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(40.0),
-                  borderSide: BorderSide.none,
+              SizedBox(height: 20),
+              TextFormField(
+                controller: _emailController,
+                validator: _validateEmail,
+                decoration: InputDecoration(
+                  hintText: 'Email',
+                  hintStyle: TextStyle(color: Colors.grey[500]),
+                  filled: true,
+                  fillColor: Colors.grey[200],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(40.0),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 14.0,
+                  ),
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 14.0,
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _passwordController,
+                validator: _validatePassword,
+                obscureText: true,
+                decoration: InputDecoration(
+                  hintText: 'Password',
+                  hintStyle: TextStyle(color: Colors.grey[500]),
+                  filled: true,
+                  fillColor: Colors.grey[200],
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(40.0),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 14.0,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: InputDecoration(
-                hintText: 'Password',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                filled: true,
-                fillColor: Colors.grey[200],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(40.0),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16.0,
-                  vertical: 14.0,
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: isLoading ? null : _login, // Disable button saat loading
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                child: isLoading
+                    ? SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      )
+                    : Text(
+                        "Sign In",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontFamily: 'BreeSerif',
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => RegisterPage()),
+                  );
+                },
+                child: Text(
+                  "Don't have an account? Create one",
+                  style: TextStyle(color: Color(0xFF14AE5C)),
                 ),
               ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _login,
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-              child: Text(
-                "Sign In",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontFamily: 'BreeSerif',
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => RegisterPage()),
-                );
-              },
-              child: Text(
-                "Don't have an account? Create one",
-                style: TextStyle(color: Color(0xFF14AE5C)),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
