@@ -6,6 +6,9 @@ import 'package:medicai/Pages/diagnose.dart';
 import 'package:medicai/Pages/hospital_page.dart';
 import 'package:medicai/Pages/History_page.dart';
 import 'package:medicai/Pages/chat_log.dart';
+import 'package:medicai/Pages/article_page.dart'; 
+import 'package:medicai/Pages/article_detail_page.dart'; 
+import 'package:medicai/Model/article.dart'; 
 import '../Model/hospital_model.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -19,6 +22,7 @@ class _HomePageState extends State<HomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String firstName = "User";
   List<Facility> hospitals = [];
+  List<Article> articles = []; // Add this line
   bool isLoading = true;
 
   @override
@@ -26,6 +30,13 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _fetchUserData();
     fetchFacilities();
+    _loadSampleArticles(); 
+  }
+
+  void _loadSampleArticles() {
+    setState(() {
+      articles = Article.getSampleArticles().take(3).toList(); // Show only 3 articles on home page
+    });
   }
 
   Future<void> _fetchUserData() async {
@@ -148,6 +159,145 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // Add this method to build article cards
+  Widget _buildArticleCard(Article article) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ArticleDetailPage(
+              title: article.title,
+              imageUrl: article.imageUrl,
+              category: article.category,
+              date: article.date,
+              author: article.author,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Article image
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                bottomLeft: Radius.circular(12),
+              ),
+              child: Image.asset(
+                article.imageUrl,
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: 100,
+                    height: 100,
+                    color: Colors.grey[300],
+                    child: const Icon(
+                      Icons.image_not_supported,
+                      color: Colors.grey,
+                    ),
+                  );
+                },
+              ),
+            ),
+            // Article content
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Category badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF3CB371).withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        article.category,
+                        style: const TextStyle(
+                          color: Color(0xFF3CB371),
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'BreeSerif',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    // Article title
+                    Text(
+                      article.title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Color(0xFF5B8A72),
+                        fontFamily: 'BreeSerif',
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    // Article description
+                    Text(
+                      article.description,
+                      style: const TextStyle(
+                        color: Colors.black54,
+                        fontSize: 12,
+                        fontFamily: 'BreeSerif',
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    // Date and read time
+                    Row(
+                      children: [
+                        Text(
+                          article.date,
+                          style: const TextStyle(
+                            color: Colors.black45,
+                            fontSize: 10,
+                            fontFamily: 'BreeSerif',
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '${article.readTime} min read',
+                          style: const TextStyle(
+                            color: Colors.black45,
+                            fontSize: 10,
+                            fontFamily: 'BreeSerif',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -612,7 +762,14 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ArticlePage(),
+                              ),
+                            );
+                          },
                           child: const Text(
                             'View More',
                             style: TextStyle(
@@ -626,26 +783,10 @@ class _HomePageState extends State<HomePage> {
                     ),
 
                     const SizedBox(height: 16),
-
-                    // Article cards
-                    Container(
-                      height: 100,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    Container(
-                      height: 100,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                    
+                    // Article cards - Replace the placeholder containers with actual article cards
+                    Column(
+                      children: articles.map((article) => _buildArticleCard(article)).toList(),
                     ),
                     const SizedBox(height: 20),
                   ],
